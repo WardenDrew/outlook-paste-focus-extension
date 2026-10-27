@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,6 +7,15 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const extension = join(root, "extension");
 const manifest = JSON.parse(readFileSync(join(extension, "manifest.json"), "utf8"));
+const args = process.argv.slice(2);
+if (args.length > 0) {
+  const releaseTag = args[0];
+  const match = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(releaseTag);
+  if (args.length !== 1 || match?.[0] !== releaseTag) {
+    throw new Error("Usage: node scripts/package.mjs [vN.N.N] (no leading zeroes or prerelease suffixes)");
+  }
+  manifest.version = releaseTag.slice(1);
+}
 const outputDir = join(root, "dist");
 const archive = join(outputDir, `outlook-paste-focus-${manifest.version}.zip`);
 
@@ -25,6 +34,7 @@ function filesWithin(directory, prefix = "") {
 const staging = mkdtempSync(join(tmpdir(), "outlook-paste-focus-package-"));
 try {
   cpSync(extension, staging, { recursive: true });
+  writeFileSync(join(staging, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
   cpSync(join(root, "LICENSE"), join(staging, "LICENSE"));
   mkdirSync(outputDir, { recursive: true });
   rmSync(archive, { force: true });

@@ -26,7 +26,7 @@ See Mozilla's [temporary installation documentation](https://extensionworkshop.c
 
 ## How it works
 
-Outlook sometimes calls `navigator.clipboard.read()` even though the paste event already supplied the content. Firefox can respond by opening a native confirmation that blocks typing. Mozilla documented this in [bug 1815733](https://bugzilla.mozilla.org/show_bug.cgi?id=1815733#c13) and implemented an [Outlook workaround](https://bugzilla.mozilla.org/show_bug.cgi?id=1815733#c23).
+Outlook sometimes calls `navigator.clipboard.read()` even though the paste event already supplied the content. Firefox can respond by opening a native confirmation that blocks typing. Mozilla documented this in [bug 1815733](https://bugzilla.mozilla.org/show_bug.cgi?id=1815733#c13) and implemented an [Outlook workaround](https://bugzilla.mozilla.org/show_bug.cgi?id=1815733#c23). As of Firefox 157, the bug still occurs despite Mozilla's workaround.
 
 This extension wraps the page's `clipboard.read()` method and returns an empty list of clipboard items for up to one second around a paste in the message editor. A pointer interaction, another keypress, opening a context menu, leaving the window, or hiding the document ends that interval early. Other calls pass through to Firefox. Native paste handles the actual content, and `readText()` is unchanged.
 
@@ -44,6 +44,18 @@ This creates `dist/outlook-paste-focus-0.1.0.zip` with `manifest.json` at the ar
 
 [Store listing and reviewer notes](docs/firefox-addons-listing.md) include ready-to-copy descriptions, release notes, repository details, and submission steps.
 
+### GitHub Actions
+
+Pull requests run the **Package build** check to ensure the extension packages successfully.
+
+To create a release package, publish a GitHub release with the same name and tag in `vN.N.N` format, for example `v1.2.3`. The release workflow sets the packaged manifest version to `1.2.3` and attaches `outlook-paste-focus-1.2.3.zip` to the release for upload to the Add-ons Developer Hub. The source manifest does not need a version bump. Release names and tags must match; leading zeroes and prerelease suffixes are rejected.
+
+To build the same versioned package locally:
+
+```sh
+node scripts/package.mjs v1.2.3
+```
+
 ## Icon
 
 The original clipboard-and-caret icon is provided as an editable [SVG](extension/icons/icon.svg) and PNG exports at 16, 32, 48, 64, 96, 128, and 512 pixels. Use [icon-128.png](extension/icons/icon-128.png) for the store listing. The manifest declares the browser icon sizes.
@@ -54,15 +66,13 @@ The extension requests access only to the two Outlook domains above. It needs th
 
 No personal data is collected, stored, or transmitted. See the [privacy policy](PRIVACY.md).
 
-## Manual verification
+## Testing
 
-Paste text into a new Outlook message and type immediately. Check that the redundant Firefox **Paste** confirmation does not appear and that Microsoft's **Paste options (Ctrl)** control remains available. Also check formatted text and images, replacing a selection, consecutive pastes, and deliberate use of Microsoft's paste-options menu.
-
-The fix has been confirmed in a manual Outlook check. Other content types and changes in Outlook's editor markup, clipboard calls, or timing may require further manual verification. A legitimate programmatic `clipboard.read()` during the same one-second interval also receives an empty list. This extension does not restore focus if Microsoft's own menu independently takes it.
+Test manually in Outlook: paste text, formatted content, or an image into a new message, then type immediately. Firefox's extra **Paste** prompt should stay hidden, and Microsoft's **Paste options (Ctrl)** control should still work.
 
 ## Support and contributions
 
-Report issues using this repository's Issues page. Include your Firefox version, operating system, Outlook domain, paste shortcut, source application, and steps to reproduce using sample content. Small, focused contributions are welcome; browser verification is manual, and this repository does not include automated tests.
+Report issues using this repository's Issues page. Include your Firefox version, operating system, Outlook domain, paste shortcut, source application, and steps to reproduce using sample content. Small, focused contributions are welcome.
 
 ## License
 

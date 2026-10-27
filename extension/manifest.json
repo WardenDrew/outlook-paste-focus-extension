@@ -3,6 +3,7 @@
   "name": "Outlook Paste Focus",
   "version": "0.1.0",
   "description": "Prevent Firefox's redundant clipboard prompt in Outlook while keeping Microsoft's paste options available.",
+  "homepage_url": "https://github.com/WardenDrew/outlook-paste-focus-extension",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
