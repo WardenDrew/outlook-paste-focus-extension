@@ -2,6 +2,8 @@
 
 # Outlook Paste Focus
 
+[![Get the Firefox add-on](https://img.shields.io/badge/Firefox-Get_the_add--on-FF7139?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/outlook-paste-focus/)
+
 **Paste into Outlook. Keep typing.**
 
 A lightweight Firefox extension that prevents the extra browser **Paste** prompt in Outlook on the web, while keeping Microsoft's **Paste options (Ctrl)** control available.
